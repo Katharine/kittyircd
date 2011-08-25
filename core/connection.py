@@ -30,7 +30,7 @@ class Connection(object):
         if not modules.call_hook(command, self, args):
             # Send back an unsupported command error - nothing happened
             # Hack: we shouldn't have to pull server out of modules...
-            self.message(modules.server.host, ERR_UNKNOWNCOMMAND, self.nick, "Unknown command")
+            self.message(modules.server.host, ERR_UNKNOWNCOMMAND, command, "Unknown command")
     
     def message(self, origin, command, *args):
         line_parts = []

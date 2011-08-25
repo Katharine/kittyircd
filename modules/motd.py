@@ -14,6 +14,6 @@ def get_motd(connection, args=None):
                 if not line:
                     break
                 connection.message(server.host, RPL_MOTD, "- %s" % line.rstrip())
-            connection.message(server.host, RPL_ENDOFMOTD, "-End of MOTD command")
+            connection.message(server.host, RPL_ENDOFMOTD, "- End of MOTD command")
     except:
         connection.message(server.host, ERR_NOMOTD, "MOTD File is missing")

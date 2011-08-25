@@ -12,6 +12,16 @@ class UserManager(object):
         add_hook('USER', self.user)
         add_hook('QUIT', self.quit)
         add_hook('MODE', self.mode)
+        
+    def shutdown(self):
+        # We kill everyone now.
+        logger.warn("Terminating all connections to avoid inconsistencies.")
+        for user in self.pending_users:
+            logger.info("Disconnecting unregistered user.")
+            user.terminate("user_manager module unloading!")
+        for user in self.users:
+            logger.info("Disconnecting %s" % user)
+            self.users[user].terminate("user_manager module unloading!")
     
     def dead_user(self, connection):
         if connection in self.pending_users:
@@ -131,3 +141,6 @@ def local_users():
 def init():
     global manager
     manager = UserManager()
+
+def shutdown():
+    manager.shutdown()
