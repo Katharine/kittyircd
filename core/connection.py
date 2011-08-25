@@ -7,13 +7,13 @@ class Connection(object):
         self.socket = sock
         self.fd = sock.makefile('rw')
         self.nick = None
-        self.ident = None
         self.host, self.port = sock.getpeername()
         modules.call_hook('connection_init', self)
     
     def handle(self, line):
         origin = None
         line = line.strip("\r\n")
+        modules.call_hook('incoming_message', self, line)
         if line[0] == ':':
             hostmask, line = line[1:].split(' ', 1)
             parts = hostmask.split('!', 1)
@@ -30,7 +30,7 @@ class Connection(object):
         if not modules.call_hook(command, self, args):
             # Send back an unsupported command error - nothing happened
             # Hack: we shouldn't have to pull server out of modules...
-            self.message(modules.server.host, ERR_UNKNOWNCOMMAND, "Unknown command")
+            self.message(modules.server.host, ERR_UNKNOWNCOMMAND, self.nick, "Unknown command")
     
     def message(self, origin, command, *args):
         line_parts = []
@@ -38,8 +38,10 @@ class Connection(object):
         if origin is not None:
             line_parts.append(":%s" % origin)
         if isinstance(command, int):
-            command = str(command).rjust(3, '0')
-        line_parts.append(command)
+            line_parts.append(str(command).rjust(3, '0'))
+            line_parts.append(self.nick)
+        else:
+            line_parts.append(command)
         if len(args) > 0:
             last_arg = None
             if ' ' in args[-1]:
@@ -49,7 +51,7 @@ class Connection(object):
                 line_parts.append(':%s' % last_arg)
         line = ' '.join(line_parts)
         print "-> %s" % line
-        self.fd.write("%s\n" % line)
+        self.fd.write("%s\r\n" % line)
         self.fd.flush()
     
     def terminate(self, reason=None):
@@ -67,5 +69,6 @@ class Connection(object):
             if not line:
                 print "User %s (%s) disconnected." % (self.nick, self.host)
                 break
+            print "<- %s" % line.rstrip()
             self.handle(line)
         modules.call_hook('connection_destroy', self)
