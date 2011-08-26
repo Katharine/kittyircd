@@ -45,7 +45,7 @@ class Connection(object):
         args = [str(x) for x in args]
         if len(args) > 0:
             last_arg = None
-            if ' ' in args[-1]:
+            if ' ' in args[-1] or args[-1][0] == ':':
                 last_arg = args.pop()
             line_parts.extend(args)
             if last_arg is not None:

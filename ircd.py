@@ -23,6 +23,7 @@ def main(backdoor=True):
     modules.load_module('ping')
     modules.load_module('whois')
     modules.load_module('idle')
+    modules.load_module('privmsg')
     
     # Go go go!
     listener.run()

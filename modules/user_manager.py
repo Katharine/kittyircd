@@ -64,7 +64,7 @@ class UserManager(object):
     
     def user(self, connection, args):
         if len(args) < 4:
-            connection.message(server.host, ERR_NEEDMOREPARAMS, "Not enough parameters")
+            connection.message(server.host, ERR_NEEDMOREPARAMS, "USER", "Not enough parameters")
             return
         if connection.registered:
             connection.message(server.host, ERR_ALREADYREGISTERED, "Unauthorized command (already registered)")
@@ -91,7 +91,7 @@ class UserManager(object):
     
     def mode(self, connection, args):
         if len(args) < 2:
-            connection.message(server.host, ERR_NEEDMOREPARAMS, "Not enough parameters")
+            connection.message(server.host, ERR_NEEDMOREPARAMS, "MODE", "Not enough parameters")
             return
         if args[0][0] in ('#',):
             return
@@ -142,7 +142,7 @@ def net_users():
     return manager.users
 
 def get_user(nick):
-    return manager.users.get(nick)
+    return manager.users.get(nick.lower())
 
 def user_exists(nick):
     return nick in manager.users

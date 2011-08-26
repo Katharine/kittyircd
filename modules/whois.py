@@ -43,8 +43,8 @@ def lusers(connection, args):
 def whois(connection, args):
     if len(args) == 0:
         connection.message(server.host, ERR_NONICKNAMEGIVEN, "No nickname given")
-    elif len(args) == 2 and args[0].lower() != server.host.lower():
-        connection.message(server.host, ERR_NOSUCHSERVER, "No such server")
+    elif len(args) == 2 and args[0].lower() != server.host.lower() and args[0] != args[1]: # This last check is dumb.
+        connection.message(server.host, ERR_NOSUCHSERVER, args[0], "No such server")
     else:
         nick = args[0] if len(args) == 1 else args[1]
         if m('user_manager').user_exists(nick):
@@ -55,5 +55,4 @@ def whois(connection, args):
                 connection.message(server.host, RPL_WHOISIDLE, user.nick, (datetime.datetime.now() - user.last_active).total_seconds(), "seconds idle")
             connection.message(server.host, RPL_ENDOFWHOIS, user.nick, "End of WHOIS list")
         else:
-            connection.message(server.host, ERR_NOSUCHNICK, "No such nick/channel")
-        
+            connection.message(server.host, ERR_NOSUCHNICK, nick, "No such nick/channel")
