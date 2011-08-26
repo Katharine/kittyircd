@@ -136,7 +136,16 @@ class UserManager(object):
 manager = None
 
 def local_users():
-    return manager.users.values()
+    return manager.users
+    
+def net_users():
+    return manager.users
+
+def get_user(nick):
+    return manager.users.get(nick)
+
+def user_exists(nick):
+    return nick in manager.users
 
 def init():
     global manager

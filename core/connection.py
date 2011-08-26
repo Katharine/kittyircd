@@ -3,7 +3,8 @@ from core.response_codes import ERR_UNKNOWNCOMMAND
 from eventlet.green import socket
 
 class Connection(object):
-    def __init__(self, sock):
+    def __init__(self, server, sock):
+        self.server = server
         self.socket = sock
         self.fd = sock.makefile('rw')
         self.nick = None
@@ -29,8 +30,7 @@ class Connection(object):
         command = args.pop(0).upper()
         if not modules.call_hook(command, self, args):
             # Send back an unsupported command error - nothing happened
-            # Hack: we shouldn't have to pull server out of modules...
-            self.message(modules.server.host, ERR_UNKNOWNCOMMAND, command, "Unknown command")
+            self.message(self.server.host, ERR_UNKNOWNCOMMAND, command, "Unknown command")
     
     def message(self, origin, command, *args):
         line_parts = []
@@ -42,6 +42,7 @@ class Connection(object):
             line_parts.append(self.nick)
         else:
             line_parts.append(command)
+        args = [str(x) for x in args]
         if len(args) > 0:
             last_arg = None
             if ' ' in args[-1]:

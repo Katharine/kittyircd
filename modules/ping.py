@@ -34,7 +34,7 @@ def received_something(connection, message):
 
 def ping_all():
     while True:
-        for user in m('user_manager').local_users():
+        for user in m('user_manager').local_users().values():
             time_passed = datetime.datetime.now() - user.last_ping
             if time_passed > datetime.timedelta(minutes=7):
                 # Bad luck.

@@ -13,7 +13,7 @@ class Listener(object):
     
     def connection(self, socket):
         print "Client connected."
-        user = core.connection.Connection(socket)
+        user = core.connection.Connection(self, socket)
         user.loop()
         print "Client disconnected."
     

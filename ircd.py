@@ -10,7 +10,7 @@ def main(backdoor=True):
         eventlet.spawn(eventlet.backdoor.backdoor_server, eventlet.listen(('localhost', 6666)), {
             'load_module': lambda x: modules.load_module(x),
             'unload_module': lambda x: modules.unload_module(x),
-            'get_module': lambda x: modules.get_module(x),
+            'm': lambda x: modules.get_module(x),
         })
     
     # Create our server.
@@ -21,6 +21,8 @@ def main(backdoor=True):
     modules.load_module('user_manager')
     modules.load_module('motd')
     modules.load_module('ping')
+    modules.load_module('whois')
+    modules.load_module('idle')
     
     # Go go go!
     listener.run()
