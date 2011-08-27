@@ -69,6 +69,7 @@ class UserManager(object):
         if connection.registered:
             connection.message(server.host, ERR_ALREADYREGISTERED, "Unauthorized command (already registered)")
             return
+        print args
         user, mask, unused, realname = args
         try:
             mask = int(mask)

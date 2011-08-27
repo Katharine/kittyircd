@@ -9,8 +9,18 @@ def transmit(method, origin, args):
         origin.message(server.host, ERR_NEEDMOREPARAMS, method, "Not enough parameters")
         return
     if args[0][0] in '#':
-        return # Not our problem.
-    target = m('user_manager').get_user(args[0])
-    if target is None:
-        origin.message(server.host, ERR_NOSUCHNICK, args[0], "No such nick/channel")
-    target.message("%s!%s@%s" % (origin.nick, origin.user, origin.host), method, args[0], args[1])
+        if m('channel_manager'):
+            c = m('channel_manager')
+            chan_name = args[0].lower()
+            if chan_name in c.channels:
+                chan = c.channels[chan_name]
+                chan.message(origin, "%s!%s@%s" % (origin.nick, origin.user, origin.host), method, args[0], args[1])
+            else:
+                origin.message(server.host, ERR_NOSUCHNICK, args[0], "No such nick/channel")
+        else:
+            origin.message(server.host, ERR_NOSUCHNICK, args[0], "No such nick/channel")
+    elif m('user_manager'):
+        target = m('user_manager').get_user(args[0])
+        if target is None:
+            origin.message(server.host, ERR_NOSUCHNICK, args[0], "No such nick/channel")
+        target.message("%s!%s@%s" % (origin.nick, origin.user, origin.host), method, args[0], args[1])

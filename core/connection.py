@@ -33,9 +33,13 @@ class Connection(object):
             self.message(self.server.host, ERR_UNKNOWNCOMMAND, command, "Unknown command")
     
     def message(self, origin, command, *args):
+        if not self.connected:
+            return
         line_parts = []
         args = list(args)
         if origin is not None:
+            if isinstance(origin, Connection):
+                origin = "%s!%s@%s" % (origin.nick, origin.user, origin.host)
             line_parts.append(":%s" % origin)
         if isinstance(command, int):
             line_parts.append(str(command).rjust(3, '0'))
@@ -45,7 +49,7 @@ class Connection(object):
         args = [str(x) for x in args]
         if len(args) > 0:
             last_arg = None
-            if ' ' in args[-1] or args[-1][0] == ':':
+            if ' ' in args[-1] or (len(args[-1]) > 0 and args[-1][0] == ':'):
                 last_arg = args.pop()
             line_parts.extend(args)
             if last_arg is not None:
@@ -57,10 +61,19 @@ class Connection(object):
     
     def terminate(self, reason=None):
         self.disconnect_reason = reason
-        self.message(None, "ERROR", "Quit: %s" % reason)
-        self.fd.close()
-        self.socket.shutdown(socket.SHUT_RDWR)
-        self.socket.close()
+        try:
+            self.message(None, "ERROR", "Quit: %s" % reason)
+        except:
+            logger.warn("Couldn't send ERROR to disconnecting user.")
+        try:
+            self.fd.close()
+            self.socket.shutdown(socket.SHUT_RDWR)
+        except:
+            pass
+        try:
+            self.socket.close()
+        except:
+            pass
         self.connected = False
     
     def loop(self):

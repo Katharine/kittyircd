@@ -19,6 +19,7 @@ def main(backdoor=True):
     
     # Load modules as appropriate (manually for now)
     modules.load_module('user_manager')
+    modules.load_module('channel_manager')
     modules.load_module('motd')
     modules.load_module('ping')
     modules.load_module('whois')
